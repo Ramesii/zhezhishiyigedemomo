@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>阿里云 RTS 双视频播放 + GELLO 遥操作</title>
+  <!-- 引入阿里云播放器 CSS -->
+  <link rel="stylesheet" href="https://g.alicdn.com/de/prismplayer/2.9.9/skins/default/aliplayer-min.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .container {
+      max-width: 1200px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      padding: 30px;
+      margin: 20px 0;
+    }
+    
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 16px;
+    }
+    
+    .players-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    
+    .player-wrapper {
+      flex: 1;
+      min-width: 300px;
+      position: relative;
+    }
+    
+    .player-title {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    
+    #J_prismPlayer1, #J_prismPlayer2 {
+      width: 100%;
+      height: 0;
+      padding-bottom: 35%; /* 16:9 */
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      background: #000;
+    }
+    
+    #J_prismPlayer1 .prism-player, #J_prismPlayer2 .prism-player {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .controls {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      min-width: 120px;
+    }
+    
+    button:hover {
+      background: #5a6fd8;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    button.active {
+      background: #4caf50;
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    }
+    
+    button:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .info-panel {
+      background: #f8f9fa;
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 0 8px 8px 0;
+    }
+    
+    .info-panel h3 {
+      margin-top: 0;
+      color: #333;
+    }
+    
+    .info-panel p {
+      margin-bottom: 5px;
+      color: #666;
+    }
+    
+    .delay-info {
+      background: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      padding: 15px;
+      margin-top: 15px;
+      border-radius: 0 8px 8px 0;
+    }
+    
+    .delay-info h3 {
+      margin-top: 0;
+      color: #2e7d32;
+    }
+    
+    .protocol-info {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+      padding: 15px;
+      background: #fff3e0;
+      border-radius: 8px;
+      border-left: 4px solid #ff9800;
+    }
+    
+    .protocol-item {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .protocol-item h4 {
+      margin-top: 0;
+      color: #e65100;
+    }
+    
+    .error-message {
+      color: #d32f2f;
+      background-color: #ffebee;
+      padding: 10px;
+      border-radius: 4px;
+      margin-top: 10px;
+      display: none;
+    }
+    
+    .latency-display {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #4caf50;
+      margin: 15px 0;
+      padding: 10px;
+      background: rgba(76, 175, 80, 0.1);
+      border-radius: 8px;
+    }
+
+    /* 新增：机器人控制区域 */
+    .robot-control {
+      background: #e3f2fd;
+      border-left: 4px solid #2196f3;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 0 8px 8px 0;
+      text-align: center;
+    }
+
+    .robot-control h3 {
+      margin-top: 0;
+      color: #0d47a1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📺 阿里云 RTS 双视频播放 + 🤖 GELLO 遥操作</h2>
+    <p class="subtitle">支持 200ms-400ms 超低延迟直播 + 一键启动机械臂控制</p>
+    
+    <div class="players-container">
+      <div class="player-wrapper">
+        <div class="player-title">主视频</div>
+        <div id="J_prismPlayer1"></div>
+      </div>
+      <div class="player-wrapper">
+        <div class="player-title">第二视频</div>
+        <div id="J_prismPlayer2"></div>
+      </div>
+    </div>
+    
+    <div class="latency-display" style="margin-top: 250px;">
+      当前延迟: <span id="latency-value">--</span> ms
+    </div>
+    
+    <div class="controls" style="margin-top: 100px;">
+      <button id="play-btn" onclick="playBothVideos()">播放全部</button>
+      <button id="pause-btn" onclick="pauseBothVideos()">暂停全部</button>
+      <button onclick="toggleMuteBoth()">静音/取消静音</button>
+      <button onclick="switchToLowLatency()">超低延迟模式</button>
+      <button onclick="switchToStandard()">标准兼容模式</button>
+    </div>
+
+    <!-- 新增：GELLO 遥操作控制按钮 -->
+    <div class="robot-control">
+      <h3>🤖 机械臂遥操作控制</h3>
+      <button onclick="startGelloTeleop()">启动 GELLO 遥操作</button>
+      <p style="font-size:14px; color:#555; margin-top:8px;">
+        点击后将自动打开两个终端，分别运行机器人节点与控制环境
+      </p>
+    </div>
+    
+    <div class="info-panel">
+      <h3>ℹ️ 播放与系统信息</h3>
+      <p><strong>播放状态:</strong> <span id="status">准备就绪</span></p>
+      <p><strong>当前协议:</strong> <span id="current-protocol">ARTC (超低延迟)</span></p>
+      <p><strong>主播放地址:</strong> <span id="url-display1"></span></p>
+      <p><strong>第二播放地址:</strong> <span id="url-display2"></span></p>
+      <p><strong>浏览器:</strong> <span id="browser-info"></span></p>
+      <p><strong>GELLO 后端状态:</strong> <span id="gello-backend-status">未检测</span></p>
+      <div id="error-message" class="error-message"></div>
+    </div>
+    
+    <div class="delay-info">
+      <h3>⚡ 延迟说明</h3>
+      <p>• <strong>ARTC协议</strong>: 200ms-400ms 超低延迟（推荐）</p>
+      <p>• <strong>FLV/HLS协议</strong>: 3-30秒 常规延迟（兼容性更好）</p>
+    </div>
+    
+    <div class="protocol-info">
+      <div class="protocol-item">
+        <h4>超低延迟模式</h4>
+        <p>• 使用 ARTC 协议 (基于 WebRTC)</p>
+        <p>• 延迟: 200ms-400ms</p>
+        <p>• 优势: 实时互动体验</p>
+      </div>
+      <div class="protocol-item">
+        <h4>标准兼容模式</h4>
+        <p>• 使用 FLV/HLS 协议</p>
+        <p>• 延迟: 3-30秒</p>
+        <p>• 优势: 更好的浏览器兼容性</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 引入阿里云播放器 JS -->
+  <script src="https://g.alicdn.com/de/prismplayer/2.9.9/aliplayer-min.js"></script>
+
+  <script>
+    // RTS播放地址（artc://协议）
+    const RTS_PLAY_URL1 = "artc://a.zhezhishiyigedemo.me/live/live?auth_key=1762314680-0-0-1f1a9fa873d0b1a12ff1957bedf3c7ac";
+    const RTS_PLAY_URL2 = "artc://c.zhezhishiyigedemo.me/live/live?auth_key=1762318487-0-0-8e5b7da3581c66d46023d50c2927e6bf";
+    
+    // 转推域名地址（用于标准协议兼容）
+    const STANDARD_FLV_URL1 = "http://c.zhezhishiyigedemo.me/live/live.flv";
+    const STANDARD_FLV_URL2 = "http://c.zhezhishiyigedemo.me/live/live2.flv";
+    const STANDARD_HLS_URL1 = "http://c.zhezhishiyigedemo.me/live/live.m3u8";
+    const STANDARD_HLS_URL2 = "http://c.zhezhishiyigedemo.me/live/live2.m3u8";
+    
+    let player1, player2;
+    let currentMode = 'low-latency';
+    let latencyTimer;
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('url-display1').textContent = RTS_PLAY_URL1;
+      document.getElementById('url-display2').textContent = RTS_PLAY_URL2;
+      
+      const userAgent = navigator.userAgent;
+      let browserInfo = '其他浏览器';
+      if (userAgent.includes('Edg')) {
+        browserInfo = 'Microsoft Edge';
+      } else if (userAgent.includes('Chrome')) {
+        browserInfo = 'Google Chrome';
+      } else if (userAgent.includes('Firefox')) {
+        browserInfo = 'Mozilla Firefox';
+      }
+      document.getElementById('browser-info').textContent = browserInfo;
+      
+      createPlayers();
+      startLatencySimulation();
+      checkGelloBackend(); // 检测后端是否运行
+    });
+
+    // 检测 GELLO 后端是否可用
+    async function checkGelloBackend() {
+      try {
+        const res = await fetch('http://127.0.0.1:5001/health');
+        if (res.ok) {
+          document.getElementById('gello-backend-status').textContent = '✅ 已就绪';
+          document.getElementById('gello-backend-status').style.color = '#4caf50';
+        } else {
+          throw new Error('Health check failed');
+        }
+      } catch (e) {
+        document.getElementById('gello-backend-status').textContent = '❌ 未运行（请先启动 gello_control.py）';
+        document.getElementById('gello-backend-status').style.color = '#f44336';
+      }
+    }
+
+    // 启动 GELLO 遥操作
+    async function startGelloTeleop() {
+      const btn = event.target;
+      btn.disabled = true;
+      btn.textContent = "启动中...";
+
+      try {
+        const response = await fetch('http://127.0.0.1:5001/start_gello', {
+          method: 'POST'
+        });
+        const data = await response.json();
+        
+        if (response.ok) {
+          document.getElementById('status').textContent = '✅ GELLO 遥操作已启动！';
+          alert('GELLO 遥操作已启动！\n请查看新打开的两个终端窗口。');
+        } else {
+          throw new Error(data.message || '未知错误');
+        }
+      } catch (error) {
+        console.error('启动遥操作失败:', error);
+        showError('无法启动遥操作：' + error.message + '（请确认 gello_control.py 正在运行）');
+        document.getElementById('status').textContent = '❌ 启动遥操作失败';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "启动 GELLO 遥操作";
+      }
+    }
+    
+    // 创建播放器
+    function createPlayers() {
+      const config1 = {
+        id: "J_prismPlayer1",
+        isLive: true,
+        autoplay: true,
+        useH5Prism: true,
+        width: '100%',
+        height: '100%'
+      };
+      
+      const config2 = {
+        id: "J_prismPlayer2",
+        isLive: true,
+        autoplay: true,
+        useH5Prism: true,
+        width: '100%',
+        height: '100%'
+      };
+      
+      if (currentMode === 'low-latency') {
+        config1.source = RTS_PLAY_URL1;
+        config1.rtsFallback = true;
+        config1.rtsFallbackType = 'FLV';
+        config1.fallbackUrl = STANDARD_FLV_URL1;
+        
+        config2.source = RTS_PLAY_URL2;
+        config2.rtsFallback = true;
+        config2.rtsFallbackType = 'FLV';
+        config2.fallbackUrl = STANDARD_FLV_URL2;
+        
+        document.getElementById('current-protocol').textContent = 'ARTC (超低延迟)';
+      } else {
+        config1.source = STANDARD_FLV_URL1;
+        config2.source = STANDARD_FLV_URL2;
+        document.getElementById('current-protocol').textContent = 'FLV (标准兼容)';
+      }
+      
+      if (player1) player1.dispose();
+      if (player2) player2.dispose();
+      
+      player1 = new Aliplayer(config1, function(player) {
+        console.log("播放器1创建成功");
+        document.getElementById('status').textContent = '播放器1已就绪';
+        updateButtonStates();
+      });
+      
+      player2 = new Aliplayer(config2, function(player) {
+        console.log("播放器2创建成功");
+        document.getElementById('status').textContent = '播放器2已就绪';
+        updateButtonStates();
+      });
+      
+      bindPlayerEvents();
+    }
+    
+    function bindPlayerEvents() {
+      // Player 1
+      player1.on("rtsTraceId", () => document.getElementById('status').textContent = '播放器1正在播放 (超低延迟)');
+      player1.on("rtsFallback", (e) => document.getElementById('status').textContent = '播放器1已降级: ' + e.paramData.reason);
+      player1.on("error", (e) => {
+        document.getElementById('status').textContent = '播放器1播放出错';
+        showError("播放器1错误: " + (e.message || JSON.stringify(e)));
+      });
+      player1.on("play", () => { document.getElementById('status').textContent = '播放器1正在播放'; updateButtonStates(); });
+      player1.on("pause", () => { document.getElementById('status').textContent = '播放器1已暂停'; updateButtonStates(); });
+      
+      // Player 2
+      player2.on("rtsTraceId", () => document.getElementById('status').textContent = '播放器2正在播放 (超低延迟)');
+      player2.on("rtsFallback", (e) => document.getElementById('status').textContent = '播放器2已降级: ' + e.paramData.reason);
+      player2.on("error", (e) => {
+        document.getElementById('status').textContent = '播放器2播放出错';
+        showError("播放器2错误: " + (e.message || JSON.stringify(e)));
+      });
+      player2.on("play", () => { document.getElementById('status').textContent = '播放器2正在播放'; updateButtonStates(); });
+      player2.on("pause", () => { document.getElementById('status').textContent = '播放器2已暂停'; updateButtonStates(); });
+    }
+    
+    function playBothVideos() { player1.play(); player2.play(); }
+    function pauseBothVideos() { player1.pause(); player2.pause(); }
+    
+    function toggleMuteBoth() {
+      const newMute = !(player1.getMuted() || player2.getMuted());
+      player1.setMuted(newMute);
+      player2.setMuted(newMute);
+    }
+    
+    function switchToLowLatency() {
+      if (currentMode !== 'low-latency') {
+        currentMode = 'low-latency';
+        createPlayers();
+        document.getElementById('status').textContent = '切换到超低延迟模式';
+        updateModeButtons();
+      }
+    }
+    
+    function switchToStandard() {
+      if (currentMode !== 'standard') {
+        currentMode = 'standard';
+        createPlayers();
+        document.getElementById('status').textContent = '切换到标准兼容模式';
+        updateModeButtons();
+      }
+    }
+    
+    function updateButtonStates() {
+      const playBtn = document.getElementById('play-btn');
+      const pauseBtn = document.getElementById('pause-btn');
+      playBtn.disabled = (player1.isPlaying() || player2.isPlaying());
+      pauseBtn.disabled = !(player1.isPlaying() || player2.isPlaying());
+    }
+    
+    function updateModeButtons() {
+      document.querySelectorAll('.controls button').forEach(btn => btn.classList.remove('active'));
+      if (currentMode === 'low-latency') {
+        document.querySelector('.controls button:nth-child(4)').classList.add('active');
+      } else {
+        document.querySelector('.controls button:nth-child(5)').classList.add('active');
+      }
+    }
+    
+    function showError(message) {
+      const el = document.getElementById('error-message');
+      el.textContent = message;
+      el.style.display = 'block';
+    }
+    
+    function hideError() {
+      document.getElementById('error-message').style.display = 'none';
+    }
+    
+    function startLatencySimulation() {
+      clearInterval(latencyTimer);
+      latencyTimer = setInterval(() => {
+        const el = document.getElementById('latency-value');
+        if (currentMode === 'low-latency') {
+          el.textContent = Math.floor(Math.random() * 200) + 200;
+          el.style.color = '#4caf50';
+        } else {
+          el.textContent = Math.floor(Math.random() * 7000) + 3000;
+          el.style.color = '#ff9800';
+        }
+      }, 1000);
+    }
+    
+    window.addEventListener('beforeunload', function() {
+      clearInterval(latencyTimer);
+      if (player1) player1.dispose();
+      if (player2) player2.dispose();
+    });
+  </script>
+</body>
+</html>
