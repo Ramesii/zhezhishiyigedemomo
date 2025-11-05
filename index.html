@@ -63,10 +63,10 @@
       color: #333;
     }
     
-    #J_prismPlayer1, #J_prismPlayer2 {
+    .prism-player {
       width: 100%;
       height: 0;
-      padding-bottom: 35%; /* 16:9 */
+      padding-bottom: 56.25%; /* 16:9 */
       position: relative;
       border-radius: 10px;
       overflow: hidden;
@@ -74,7 +74,7 @@
       background: #000;
     }
     
-    #J_prismPlayer1 .prism-player, #J_prismPlayer2 .prism-player {
+    .prism-player > div {
       position: absolute;
       top: 0;
       left: 0;
@@ -193,7 +193,6 @@
       border-radius: 8px;
     }
 
-    /* 新增：机器人控制区域 */
     .robot-control {
       background: #e3f2fd;
       border-left: 4px solid #2196f3;
@@ -207,6 +206,12 @@
       margin-top: 0;
       color: #0d47a1;
     }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
   </style>
 </head>
 <body>
@@ -217,19 +222,23 @@
     <div class="players-container">
       <div class="player-wrapper">
         <div class="player-title">主视频</div>
-        <div id="J_prismPlayer1"></div>
+        <div id="J_prismPlayer1" class="prism-player"></div>
       </div>
       <div class="player-wrapper">
         <div class="player-title">第二视频</div>
-        <div id="J_prismPlayer2"></div>
+        <div id="J_prismPlayer2" class="prism-player"></div>
       </div>
     </div>
     
-    <div class="latency-display" style="margin-top: 250px;">
+    <div class="loading" id="loading-message">
+      正在初始化播放器，请稍候...
+    </div>
+    
+    <div class="latency-display">
       当前延迟: <span id="latency-value">--</span> ms
     </div>
     
-    <div class="controls" style="margin-top: 100px;">
+    <div class="controls">
       <button id="play-btn" onclick="playBothVideos()">播放全部</button>
       <button id="pause-btn" onclick="pauseBothVideos()">暂停全部</button>
       <button onclick="toggleMuteBoth()">静音/取消静音</button>
@@ -237,7 +246,6 @@
       <button onclick="switchToStandard()">标准兼容模式</button>
     </div>
 
-    <!-- 新增：GELLO 遥操作控制按钮 -->
     <div class="robot-control">
       <h3>🤖 机械臂遥操作控制</h3>
       <button onclick="startGelloTeleop()">启动 GELLO 遥操作</button>
@@ -248,7 +256,7 @@
     
     <div class="info-panel">
       <h3>ℹ️ 播放与系统信息</h3>
-      <p><strong>播放状态:</strong> <span id="status">准备就绪</span></p>
+      <p><strong>播放状态:</strong> <span id="status">初始化中...</span></p>
       <p><strong>当前协议:</strong> <span id="current-protocol">ARTC (超低延迟)</span></p>
       <p><strong>主播放地址:</strong> <span id="url-display1"></span></p>
       <p><strong>第二播放地址:</strong> <span id="url-display2"></span></p>
@@ -283,19 +291,29 @@
   <script src="https://g.alicdn.com/de/prismplayer/2.9.9/aliplayer-min.js"></script>
 
   <script>
-    // RTS播放地址（artc://协议）
-    const RTS_PLAY_URL1 = "artc://a.zhezhishiyigedemo.me/live/live";
-    const RTS_PLAY_URL2 = "artc://c.zhezhishiyigedemo.me/live/live";
+    // 使用 HTTPS 地址避免混合内容问题
+    const RTS_PLAY_URL1 = "artc://a.zhezhishiyigedemo.me/live/live?auth_key=1762314680-0-0-1f1a9fa873d0b1a12ff1957bedf3c7ac";
+    const RTS_PLAY_URL2 = "artc://c.zhezhishiyigedemo.me/live/live?auth_key=1762318487-0-0-8e5b7da3581c66d46023d50c2927e6bf";
     
-    // 转推域名地址（用于标准协议兼容）
-    const STANDARD_FLV_URL1 = "http://c.zhezhishiyigedemo.me/live/live.flv";
-    const STANDARD_FLV_URL2 = "http://c.zhezhishiyigedemo.me/live/live2.flv";
-    const STANDARD_HLS_URL1 = "http://c.zhezhishiyigedemo.me/live/live.m3u8";
-    const STANDARD_HLS_URL2 = "http://c.zhezhishiyigedemo.me/live/live2.m3u8";
+    // 使用 HTTPS 转推地址
+    const STANDARD_FLV_URL1 = "https://c.zhezhishiyigedemo.me/live/live.flv";
+    const STANDARD_FLV_URL2 = "https://c.zhezhishiyigedemo.me/live/live2.flv";
+    const STANDARD_HLS_URL1 = "https://c.zhezhishiyigedemo.me/live/live.m3u8";
+    const STANDARD_HLS_URL2 = "https://c.zhezhishiyigedemo.me/live/live2.m3u8";
     
     let player1, player2;
     let currentMode = 'low-latency';
     let latencyTimer;
+    let playersReady = 0;
+
+    // 等待播放器脚本加载完成
+    function waitForPlayer(callback) {
+      if (window.Aliplayer) {
+        callback();
+      } else {
+        setTimeout(() => waitForPlayer(callback), 100);
+      }
+    }
 
     // 初始化
     document.addEventListener('DOMContentLoaded', function() {
@@ -310,12 +328,17 @@
         browserInfo = 'Google Chrome';
       } else if (userAgent.includes('Firefox')) {
         browserInfo = 'Mozilla Firefox';
+      } else if (userAgent.includes('Safari')) {
+        browserInfo = 'Safari';
       }
       document.getElementById('browser-info').textContent = browserInfo;
       
-      createPlayers();
-      startLatencySimulation();
-      checkGelloBackend(); // 检测后端是否运行
+      // 等待播放器加载完成
+      waitForPlayer(function() {
+        createPlayers();
+        startLatencySimulation();
+        checkGelloBackend();
+      });
     });
 
     // 检测 GELLO 后端是否可用
@@ -364,22 +387,25 @@
     
     // 创建播放器
     function createPlayers() {
-      const config1 = {
-        id: "J_prismPlayer1",
+      const commonConfig = {
         isLive: true,
-        autoplay: true,
+        autoplay: false, // 改为手动播放避免自动播放策略限制
         useH5Prism: true,
         width: '100%',
-        height: '100%'
+        height: '100%',
+        controlBarVisibility: 'hover',
+        extraInfo: '{"crossOrigin": "anonymous"}',
+        rtsSecure: true
+      };
+      
+      const config1 = {
+        ...commonConfig,
+        id: "J_prismPlayer1"
       };
       
       const config2 = {
-        id: "J_prismPlayer2",
-        isLive: true,
-        autoplay: true,
-        useH5Prism: true,
-        width: '100%',
-        height: '100%'
+        ...commonConfig,
+        id: "J_prismPlayer2"
       };
       
       if (currentMode === 'low-latency') {
@@ -400,60 +426,137 @@
         document.getElementById('current-protocol').textContent = 'FLV (标准兼容)';
       }
       
-      if (player1) player1.dispose();
-      if (player2) player2.dispose();
-      
-      player1 = new Aliplayer(config1, function(player) {
-        console.log("播放器1创建成功");
-        document.getElementById('status').textContent = '播放器1已就绪';
+      try {
+        if (player1) player1.dispose();
+        if (player2) player2.dispose();
+        
+        playersReady = 0;
+        
+        player1 = new Aliplayer(config1, function(player) {
+          console.log("播放器1创建成功");
+          playersReady++;
+          checkAllPlayersReady();
+        });
+        
+        player2 = new Aliplayer(config2, function(player) {
+          console.log("播放器2创建成功");
+          playersReady++;
+          checkAllPlayersReady();
+        });
+        
+        bindPlayerEvents();
+      } catch (error) {
+        showError("播放器初始化失败: " + error.message);
+        console.error("播放器初始化错误:", error);
+      }
+    }
+    
+    function checkAllPlayersReady() {
+      if (playersReady === 2) {
+        document.getElementById('loading-message').style.display = 'none';
+        document.getElementById('status').textContent = '播放器已就绪，点击播放按钮开始';
         updateButtonStates();
-      });
-      
-      player2 = new Aliplayer(config2, function(player) {
-        console.log("播放器2创建成功");
-        document.getElementById('status').textContent = '播放器2已就绪';
-        updateButtonStates();
-      });
-      
-      bindPlayerEvents();
+      }
     }
     
     function bindPlayerEvents() {
-      // Player 1
-      player1.on("rtsTraceId", () => document.getElementById('status').textContent = '播放器1正在播放 (超低延迟)');
-      player1.on("rtsFallback", (e) => document.getElementById('status').textContent = '播放器1已降级: ' + e.paramData.reason);
-      player1.on("error", (e) => {
-        document.getElementById('status').textContent = '播放器1播放出错';
-        showError("播放器1错误: " + (e.message || JSON.stringify(e)));
+      // Player 1 事件
+      player1.on("ready", () => {
+        console.log("播放器1准备就绪");
       });
-      player1.on("play", () => { document.getElementById('status').textContent = '播放器1正在播放'; updateButtonStates(); });
-      player1.on("pause", () => { document.getElementById('status').textContent = '播放器1已暂停'; updateButtonStates(); });
       
-      // Player 2
-      player2.on("rtsTraceId", () => document.getElementById('status').textContent = '播放器2正在播放 (超低延迟)');
-      player2.on("rtsFallback", (e) => document.getElementById('status').textContent = '播放器2已降级: ' + e.paramData.reason);
-      player2.on("error", (e) => {
-        document.getElementById('status').textContent = '播放器2播放出错';
-        showError("播放器2错误: " + (e.message || JSON.stringify(e)));
+      player1.on("rtsTraceId", () => {
+        document.getElementById('status').textContent = '播放器1正在播放 (超低延迟)';
+        hideError();
       });
-      player2.on("play", () => { document.getElementById('status').textContent = '播放器2正在播放'; updateButtonStates(); });
-      player2.on("pause", () => { document.getElementById('status').textContent = '播放器2已暂停'; updateButtonStates(); });
+      
+      player1.on("rtsFallback", (e) => {
+        document.getElementById('status').textContent = '播放器1已降级: ' + (e.paramData?.reason || '未知原因');
+        showError("播放器1已降级到FLV模式，可能是RTS连接失败");
+      });
+      
+      player1.on("error", (e) => {
+        const errorMsg = e.paramData ? JSON.stringify(e.paramData) : (e.message || '未知错误');
+        document.getElementById('status').textContent = '播放器1播放出错';
+        showError("播放器1错误: " + errorMsg);
+      });
+      
+      player1.on("play", () => { 
+        document.getElementById('status').textContent = '播放器1正在播放'; 
+        updateButtonStates(); 
+      });
+      
+      player1.on("pause", () => { 
+        document.getElementById('status').textContent = '播放器1已暂停'; 
+        updateButtonStates(); 
+      });
+      
+      // Player 2 事件
+      player2.on("ready", () => {
+        console.log("播放器2准备就绪");
+      });
+      
+      player2.on("rtsTraceId", () => {
+        document.getElementById('status').textContent = '播放器2正在播放 (超低延迟)';
+        hideError();
+      });
+      
+      player2.on("rtsFallback", (e) => {
+        document.getElementById('status').textContent = '播放器2已降级: ' + (e.paramData?.reason || '未知原因');
+        showError("播放器2已降级到FLV模式，可能是RTS连接失败");
+      });
+      
+      player2.on("error", (e) => {
+        const errorMsg = e.paramData ? JSON.stringify(e.paramData) : (e.message || '未知错误');
+        document.getElementById('status').textContent = '播放器2播放出错';
+        showError("播放器2错误: " + errorMsg);
+      });
+      
+      player2.on("play", () => { 
+        document.getElementById('status').textContent = '播放器2正在播放'; 
+        updateButtonStates(); 
+      });
+      
+      player2.on("pause", () => { 
+        document.getElementById('status').textContent = '播放器2已暂停'; 
+        updateButtonStates(); 
+      });
     }
     
-    function playBothVideos() { player1.play(); player2.play(); }
-    function pauseBothVideos() { player1.pause(); player2.pause(); }
+    function playBothVideos() { 
+      try {
+        player1.play(); 
+        player2.play(); 
+      } catch (error) {
+        showError("播放失败: " + error.message);
+      }
+    }
+    
+    function pauseBothVideos() { 
+      try {
+        player1.pause(); 
+        player2.pause(); 
+      } catch (error) {
+        showError("暂停失败: " + error.message);
+      }
+    }
     
     function toggleMuteBoth() {
-      const newMute = !(player1.getMuted() || player2.getMuted());
-      player1.setMuted(newMute);
-      player2.setMuted(newMute);
+      try {
+        const newMute = !(player1.getMuted() || player2.getMuted());
+        player1.setMuted(newMute);
+        player2.setMuted(newMute);
+      } catch (error) {
+        showError("静音操作失败: " + error.message);
+      }
     }
     
     function switchToLowLatency() {
       if (currentMode !== 'low-latency') {
         currentMode = 'low-latency';
+        document.getElementById('loading-message').style.display = 'block';
+        document.getElementById('status').textContent = '切换到超低延迟模式...';
         createPlayers();
-        document.getElementById('status').textContent = '切换到超低延迟模式';
         updateModeButtons();
       }
     }
@@ -461,8 +564,9 @@
     function switchToStandard() {
       if (currentMode !== 'standard') {
         currentMode = 'standard';
+        document.getElementById('loading-message').style.display = 'block';
+        document.getElementById('status').textContent = '切换到标准兼容模式...';
         createPlayers();
-        document.getElementById('status').textContent = '切换到标准兼容模式';
         updateModeButtons();
       }
     }
@@ -470,8 +574,12 @@
     function updateButtonStates() {
       const playBtn = document.getElementById('play-btn');
       const pauseBtn = document.getElementById('pause-btn');
-      playBtn.disabled = (player1.isPlaying() || player2.isPlaying());
-      pauseBtn.disabled = !(player1.isPlaying() || player2.isPlaying());
+      try {
+        playBtn.disabled = (player1 && player1.isPlaying()) || (player2 && player2.isPlaying());
+        pauseBtn.disabled = !((player1 && player1.isPlaying()) || (player2 && player2.isPlaying()));
+      } catch (error) {
+        console.error("更新按钮状态失败:", error);
+      }
     }
     
     function updateModeButtons() {
@@ -487,6 +595,7 @@
       const el = document.getElementById('error-message');
       el.textContent = message;
       el.style.display = 'block';
+      console.error("播放器错误:", message);
     }
     
     function hideError() {
@@ -514,5 +623,5 @@
     });
   </script>
 </body>
-
 </html>
+
