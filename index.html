@@ -7,74 +7,258 @@
   <!-- 引入阿里云播放器 CSS -->
   <link rel="stylesheet" href="https://g.alicdn.com/de/prismplayer/2.9.9/skins/default/aliplayer-min.css" />
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    :root {
+      --primary-color: #007AFF;
+      --primary-dark: #0056CC;
+      --secondary-color: #6C47FF;
+      --accent-color: #00C4CC;
+      --accent-purple: #9D4EDD;
+      --accent-pink: #FF2E93;
+      --dark-bg: #0A0E17;
+      --dark-card: #151A28;
+      --dark-border: #2A3445;
+      --text-primary: #F0F4F8;
+      --text-secondary: #B0B8C5;
+      --text-muted: #6B7280;
+      --success-color: #10B981;
+      --warning-color: #F59E0B;
+      --danger-color: #EF4444;
+      --glow-primary: 0 0 15px rgba(0, 122, 255, 0.5);
+      --glow-secondary: 0 0 15px rgba(108, 71, 255, 0.5);
+      --glow-accent: 0 0 15px rgba(0, 196, 204, 0.5);
+    }
+    
+    * {
+      box-sizing: border-box;
       margin: 0;
-      padding: 20px;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: 
+        radial-gradient(circle at 10% 20%, rgba(108, 71, 255, 0.15) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(0, 196, 204, 0.15) 0%, transparent 20%),
+        radial-gradient(circle at 50% 50%, rgba(157, 78, 221, 0.1) 0%, transparent 30%),
+        linear-gradient(135deg, var(--dark-bg) 0%, #0F1525 100%);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      overflow-x: hidden;
     }
     
     .container {
-      max-width: 1200px;
+      max-width: 1600px;
       width: 100%;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-      padding: 30px;
-      margin: 20px 0;
+      margin: 0 auto;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
     }
     
-    h2 {
+    /* 科技感背景元素 */
+    .tech-bg-element {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    
+    .tech-grid {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(15, 23, 42, 0.2) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.2) 1px, transparent 1px);
+      background-size: 50px 50px;
+      opacity: 0.3;
+    }
+    
+    .floating-element {
+      position: absolute;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-color), var(--accent-purple));
+      filter: blur(40px);
+      opacity: 0.1;
+      animation: float 20s infinite linear;
+    }
+    
+    .floating-element:nth-child(1) {
+      width: 300px;
+      height: 300px;
+      top: 10%;
+      left: 5%;
+      animation-delay: 0s;
+    }
+    
+    .floating-element:nth-child(2) {
+      width: 200px;
+      height: 200px;
+      top: 60%;
+      left: 80%;
+      animation-delay: -5s;
+      background: linear-gradient(135deg, var(--secondary-color), var(--accent-pink));
+    }
+    
+    .floating-element:nth-child(3) {
+      width: 150px;
+      height: 150px;
+      top: 80%;
+      left: 20%;
+      animation-delay: -10s;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    }
+    
+    @keyframes float {
+      0% {
+        transform: translate(0, 0) rotate(0deg);
+      }
+      33% {
+        transform: translate(30px, -50px) rotate(120deg);
+      }
+      66% {
+        transform: translate(-20px, 20px) rotate(240deg);
+      }
+      100% {
+        transform: translate(0, 0) rotate(360deg);
+      }
+    }
+    
+    /* 头部区域 */
+    .header {
       text-align: center;
-      color: #333;
+      padding: 30px 0;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 150px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+      border-radius: 3px;
+    }
+    
+    h1 {
+      font-size: 36px;
+      font-weight: 800;
       margin-bottom: 15px;
-      font-size: 28px;
-      font-weight: 600;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 20px rgba(108, 71, 255, 0.3);
+      letter-spacing: -0.5px;
     }
     
     .subtitle {
-      text-align: center;
-      color: #666;
-      margin-bottom: 30px;
       font-size: 16px;
+      color: var(--text-secondary);
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.5;
     }
     
+    /* 播放器区域 - 放大版 */
     .players-container {
       display: flex;
       flex-wrap: wrap;
       gap: 20px;
       justify-content: center;
+      margin-bottom: 30px;
     }
     
     .player-wrapper {
       flex: 1;
-      min-width: 300px;
+      min-width: 500px; /* 增加最小宽度 */
       position: relative;
+      background: linear-gradient(145deg, var(--dark-card), #101725);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid var(--dark-border);
+    }
+    
+    .player-wrapper::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+      z-index: 2;
+    }
+    
+    .player-wrapper:hover {
+      transform: translateY(-8px);
+      box-shadow: 
+        0 15px 35px rgba(0, 0, 0, 0.5),
+        var(--glow-primary);
     }
     
     .player-title {
       text-align: center;
-      font-weight: bold;
-      margin-bottom: 10px;
-      color: #333;
+      padding: 18px;
+      font-size: 20px; /* 增大字体 */
+      font-weight: 600;
+      background: rgba(15, 23, 42, 0.6);
+      border-bottom: 1px solid var(--dark-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
     }
     
-    .prism-player {
+    .player-title::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.5s;
+    }
+    
+    .player-wrapper:hover .player-title::before {
+      left: 100%;
+    }
+    
+    .player-title::after {
+      content: '●';
+      color: var(--accent-color);
+      margin-right: 10px;
+      font-size: 14px;
+      text-shadow: 0 0 8px var(--accent-color);
+    }
+    
+    #J_prismPlayer1, #J_prismPlayer2 {
       width: 100%;
       height: 0;
-      padding-bottom: 56.25%; /* 16:9 */
+      padding-bottom: 65%; /* 增加高度比例 */
       position: relative;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
       background: #000;
     }
     
-    .prism-player > div {
+    #J_prismPlayer1 .prism-player, #J_prismPlayer2 .prism-player {
       position: absolute;
       top: 0;
       left: 0;
@@ -82,208 +266,584 @@
       height: 100%;
     }
     
+    /* 延迟显示 */
+    .latency-display {
+      text-align: center;
+      margin: 30px 0;
+      padding: 25px;
+      background: linear-gradient(145deg, var(--dark-card), #101725);
+      border-radius: 16px;
+      box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--dark-border);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .latency-display::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    }
+    
+    .latency-value {
+      font-size: 48px;
+      font-weight: 800;
+      margin: 15px 0;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 20px rgba(0, 122, 255, 0.3);
+    }
+    
+    .latency-label {
+      font-size: 16px;
+      color: var(--text-secondary);
+      letter-spacing: 1px;
+    }
+    
+    /* 控制按钮 */
     .controls {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 15px;
-      margin-top: 20px;
+      gap: 12px;
+      margin: 30px 0;
     }
     
     button {
-      background: #667eea;
-      color: white;
-      border: none;
+      background: linear-gradient(145deg, var(--dark-card), #101725);
+      color: var(--text-primary);
+      border: 1px solid var(--dark-border);
       padding: 12px 20px;
-      border-radius: 5px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 14px;
+      min-width: 140px;
+      border-radius: 12px;
       transition: all 0.3s ease;
-      min-width: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 500;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 
+        0 5px 15px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.5s;
+    }
+    
+    button:hover::before {
+      left: 100%;
     }
     
     button:hover {
-      background: #5a6fd8;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      transform: translateY(-3px);
+      box-shadow: 
+        0 8px 20px rgba(0, 0, 0, 0.3),
+        var(--glow-primary);
+      border-color: var(--primary-color);
+    }
+    
+    button:active {
+      transform: translateY(1px);
     }
     
     button.active {
-      background: #4caf50;
-      box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border-color: var(--primary-color);
+      box-shadow: 
+        0 5px 15px rgba(0, 122, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
     }
     
     button:disabled {
-      background: #cccccc;
+      background: #1A2235;
+      color: var(--text-muted);
       cursor: not-allowed;
+      border-color: var(--dark-border);
       transform: none;
       box-shadow: none;
     }
     
-    .info-panel {
-      background: #f8f9fa;
-      border-left: 4px solid #667eea;
-      padding: 15px;
-      margin-top: 20px;
-      border-radius: 0 8px 8px 0;
+    button:disabled::before {
+      display: none;
     }
     
-    .info-panel h3 {
+    /* 区域卡片 */
+    .section {
+      background: linear-gradient(145deg, var(--dark-card), #101725);
+      border-radius: 16px;
+      padding: 25px;
+      margin: 25px 0;
+      box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--dark-border);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    }
+    
+    .section h3 {
       margin-top: 0;
-      color: #333;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     
-    .info-panel p {
-      margin-bottom: 5px;
-      color: #666;
+    .section h3::before {
+      content: '';
+      display: block;
+      width: 4px;
+      height: 20px;
+      background: linear-gradient(to bottom, var(--primary-color), var(--accent-color));
+      border-radius: 2px;
     }
     
-    .delay-info {
-      background: #e8f5e9;
-      border-left: 4px solid #4caf50;
-      padding: 15px;
+    .section p {
+      margin: 12px 0;
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    
+    /* 状态指示器 */
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid var(--dark-border);
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    
+    .status-ready {
+      background-color: var(--success-color);
+      box-shadow: 0 0 8px var(--success-color);
+    }
+    
+    .status-warning {
+      background-color: var(--warning-color);
+      box-shadow: 0 0 8px var(--warning-color);
+    }
+    
+    .status-error {
+      background-color: var(--danger-color);
+      box-shadow: 0 0 8px var(--danger-color);
+    }
+    
+    .status-loading {
+      background-color: var(--accent-color);
+      box-shadow: 0 0 8px var(--accent-color);
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { 
+        opacity: 1; 
+        box-shadow: 0 0 8px var(--accent-color);
+      }
+      50% { 
+        opacity: 0.5; 
+        box-shadow: 0 0 12px var(--accent-color);
+      }
+      100% { 
+        opacity: 1; 
+        box-shadow: 0 0 8px var(--accent-color);
+      }
+    }
+    
+    /* 错误消息 */
+    .error-message {
+      color: var(--danger-color);
+      background-color: rgba(239, 68, 68, 0.1);
+      padding: 12px 15px;
       margin-top: 15px;
-      border-radius: 0 8px 8px 0;
+      border-radius: 12px;
+      border-left: 4px solid var(--danger-color);
+      display: none;
+      font-size: 14px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
     
-    .delay-info h3 {
-      margin-top: 0;
-      color: #2e7d32;
-    }
-    
+    /* 协议信息 */
     .protocol-info {
       display: flex;
-      justify-content: space-between;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 15px;
-      padding: 15px;
-      background: #fff3e0;
-      border-radius: 8px;
-      border-left: 4px solid #ff9800;
+      gap: 20px;
     }
     
     .protocol-item {
       flex: 1;
-      min-width: 200px;
+      min-width: 250px;
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.6), rgba(10, 14, 23, 0.8));
+      border-radius: 12px;
+      padding: 20px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid var(--dark-border);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .protocol-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    }
+    
+    .protocol-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
     }
     
     .protocol-item h4 {
-      margin-top: 0;
-      color: #e65100;
+      margin: 0 0 15px 0;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--text-primary);
     }
     
-    .error-message {
-      color: #d32f2f;
-      background-color: #ffebee;
-      padding: 10px;
-      border-radius: 4px;
-      margin-top: 10px;
-      display: none;
+    .protocol-item ul {
+      list-style: none;
+      padding: 0;
     }
     
-    .latency-display {
-      text-align: center;
-      font-size: 24px;
+    .protocol-item li {
+      margin-bottom: 10px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: flex-start;
+      line-height: 1.5;
+    }
+    
+    .protocol-item li::before {
+      content: '✓';
+      color: var(--accent-color);
+      margin-right: 8px;
       font-weight: bold;
-      color: #4caf50;
-      margin: 15px 0;
-      padding: 10px;
-      background: rgba(76, 175, 80, 0.1);
-      border-radius: 8px;
+      flex-shrink: 0;
     }
-
-    .robot-control {
-      background: #e3f2fd;
-      border-left: 4px solid #2196f3;
+    
+    /* 信息网格 */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .info-item {
+      display: flex;
+      flex-direction: column;
       padding: 15px;
-      margin-top: 20px;
-      border-radius: 0 8px 8px 0;
-      text-align: center;
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.5), rgba(10, 14, 23, 0.7));
+      border-radius: 12px;
+      border: 1px solid var(--dark-border);
+      transition: transform 0.3s ease;
     }
-
-    .robot-control h3 {
-      margin-top: 0;
-      color: #0d47a1;
+    
+    .info-item:hover {
+      transform: translateY(-3px);
     }
-
-    .loading {
+    
+    .info-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      letter-spacing: 0.5px;
+    }
+    
+    .info-value {
+      font-size: 14px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    
+    /* 页脚 */
+    .footer {
       text-align: center;
-      padding: 20px;
-      color: #666;
+      padding: 30px 0;
+      margin-top: 40px;
+      border-top: 1px solid var(--dark-border);
+      color: var(--text-muted);
+      font-size: 14px;
+      position: relative;
+    }
+    
+    .footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    }
+    
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .logo-icon {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .logo-icon::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    }
+    
+    /* 响应式调整 */
+    @media (max-width: 1200px) {
+      .player-wrapper {
+        min-width: 450px;
+      }
+    }
+    
+    @media (max-width: 1024px) {
+      .player-wrapper {
+        min-width: 400px;
+      }
+    }
+    
+    @media (max-width: 900px) {
+      .players-container {
+        flex-direction: column;
+      }
+      
+      .player-wrapper {
+        min-width: 100%;
+      }
+      
+      .protocol-info {
+        flex-direction: column;
+      }
+      
+      .controls {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      button {
+        width: 100%;
+        max-width: 300px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 28px;
+      }
+      
+      .subtitle {
+        font-size: 14px;
+      }
+      
+      .player-title {
+        font-size: 18px;
+      }
+      
+      #J_prismPlayer1, #J_prismPlayer2 {
+        padding-bottom: 56.25%; /* 在小屏幕上恢复16:9比例 */
+      }
     }
   </style>
 </head>
 <body>
+  <!-- 科技感背景元素 -->
+  <div class="tech-bg-element">
+    <div class="tech-grid"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+  </div>
+  
   <div class="container">
-    <h2>📺 阿里云 RTS 双视频播放 + 🤖 GELLO 遥操作</h2>
-    <p class="subtitle">支持 200ms-400ms 超低延迟直播 + 一键启动机械臂控制</p>
+    <div class="header">
+      <h1>阿里云 RTS 双视频播放 + GELLO 遥操作</h1>
+      <p class="subtitle">专业级超低延迟直播解决方案，支持 200ms-400ms 实时视频传输与机械臂控制</p>
+    </div>
     
     <div class="players-container">
       <div class="player-wrapper">
-        <div class="player-title">主视频</div>
-        <div id="J_prismPlayer1" class="prism-player"></div>
+        <div class="player-title">主视频流</div>
+        <div id="J_prismPlayer1"></div>
       </div>
       <div class="player-wrapper">
-        <div class="player-title">第二视频</div>
-        <div id="J_prismPlayer2" class="prism-player"></div>
+        <div class="player-title">辅助视频流</div>
+        <div id="J_prismPlayer2"></div>
       </div>
-    </div>
-    
-    <div class="loading" id="loading-message">
-      正在初始化播放器，请稍候...
     </div>
     
     <div class="latency-display">
-      当前延迟: <span id="latency-value">--</span> ms
+      <div class="latency-label">当前延迟</div>
+      <div class="latency-value" id="latency-value">--</div>
+      <div class="latency-label">毫秒</div>
     </div>
     
     <div class="controls">
-      <button id="play-btn" onclick="playBothVideos()">播放全部</button>
-      <button id="pause-btn" onclick="pauseBothVideos()">暂停全部</button>
-      <button onclick="toggleMuteBoth()">静音/取消静音</button>
-      <button onclick="switchToLowLatency()">超低延迟模式</button>
-      <button onclick="switchToStandard()">标准兼容模式</button>
+      <button id="play-btn" onclick="playBothVideos()">
+        <span>▶</span> 播放全部
+      </button>
+      <button id="pause-btn" onclick="pauseBothVideos()">
+        <span>⏸</span> 暂停全部
+      </button>
+      <button onclick="toggleMuteBoth()">
+        <span>🔇</span> 静音/取消静音
+      </button>
+      <button onclick="switchToLowLatency()" id="low-latency-btn">
+        <span>⚡</span> 超低延迟模式
+      </button>
+      <button onclick="switchToStandard()" id="standard-btn">
+        <span>🔄</span> 标准兼容模式
+      </button>
     </div>
 
-    <div class="robot-control">
-      <h3>🤖 机械臂遥操作控制</h3>
-      <button onclick="startGelloTeleop()">启动 GELLO 遥操作</button>
-      <p style="font-size:14px; color:#555; margin-top:8px;">
-        点击后将自动打开两个终端，分别运行机器人节点与控制环境
+    <div class="section">
+      <h3>机械臂遥操作控制</h3>
+      <button onclick="startGelloTeleop()" id="gello-btn">
+        <span>🤖</span> 启动 GELLO 遥操作
+      </button>
+      <p style="font-size:14px; color:var(--text-muted); margin-top:15px;">
+        点击后将自动打开两个终端，分别运行机器人节点与控制环境，实现远程机械臂精确控制
       </p>
     </div>
     
-    <div class="info-panel">
-      <h3>ℹ️ 播放与系统信息</h3>
-      <p><strong>播放状态:</strong> <span id="status">初始化中...</span></p>
-      <p><strong>当前协议:</strong> <span id="current-protocol">ARTC (超低延迟)</span></p>
-      <p><strong>主播放地址:</strong> <span id="url-display1"></span></p>
-      <p><strong>第二播放地址:</strong> <span id="url-display2"></span></p>
-      <p><strong>浏览器:</strong> <span id="browser-info"></span></p>
-      <p><strong>GELLO 后端状态:</strong> <span id="gello-backend-status">未检测</span></p>
+    <div class="section">
+      <h3>播放与系统信息</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">播放状态</div>
+          <div class="info-value">
+            <span class="status-indicator">
+              <span class="status-dot status-ready"></span>
+              <span id="status">准备就绪</span>
+            </span>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">当前协议</div>
+          <div class="info-value" id="current-protocol">ARTC (超低延迟)</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">主播放地址</div>
+          <div class="info-value" id="url-display1"></div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">第二播放地址</div>
+          <div class="info-value" id="url-display2"></div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">浏览器</div>
+          <div class="info-value" id="browser-info"></div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">GELLO 后端状态</div>
+          <div class="info-value">
+            <span class="status-indicator">
+              <span class="status-dot status-warning"></span>
+              <span id="gello-backend-status">未检测</span>
+            </span>
+          </div>
+        </div>
+      </div>
       <div id="error-message" class="error-message"></div>
     </div>
     
-    <div class="delay-info">
-      <h3>⚡ 延迟说明</h3>
-      <p>• <strong>ARTC协议</strong>: 200ms-400ms 超低延迟（推荐）</p>
-      <p>• <strong>FLV/HLS协议</strong>: 3-30秒 常规延迟（兼容性更好）</p>
+    <div class="section">
+      <h3>延迟说明</h3>
+      <p>• <strong style="color:var(--accent-color);">ARTC协议</strong>: 200ms-400ms 超低延迟（推荐用于实时交互场景）</p>
+      <p>• <strong style="color:var(--text-secondary);">FLV/HLS协议</strong>: 3-30秒 常规延迟（提供更好的浏览器兼容性）</p>
     </div>
     
     <div class="protocol-info">
       <div class="protocol-item">
         <h4>超低延迟模式</h4>
-        <p>• 使用 ARTC 协议 (基于 WebRTC)</p>
-        <p>• 延迟: 200ms-400ms</p>
-        <p>• 优势: 实时互动体验</p>
+        <ul>
+          <li>使用 ARTC 协议 (基于 WebRTC)</li>
+          <li>延迟: 200ms-400ms</li>
+          <li>优势: 实时互动体验，适用于远程控制</li>
+          <li>技术: WebRTC 底层优化</li>
+        </ul>
       </div>
       <div class="protocol-item">
         <h4>标准兼容模式</h4>
-        <p>• 使用 FLV/HLS 协议</p>
-        <p>• 延迟: 3-30秒</p>
-        <p>• 优势: 更好的浏览器兼容性</p>
+        <ul>
+          <li>使用 FLV/HLS 协议</li>
+          <li>延迟: 3-30秒</li>
+          <li>优势: 更好的浏览器兼容性</li>
+          <li>技术: 标准流媒体传输</li>
+        </ul>
       </div>
+    </div>
+    
+    <div class="footer">
+      <div class="footer-logo">
+        <div class="logo-icon"></div>
+        <span>阿里云 RTS 超低延迟直播解决方案</span>
+      </div>
+      <p>专业级远程控制与视频传输平台</p>
     </div>
   </div>
 
@@ -291,29 +851,19 @@
   <script src="https://g.alicdn.com/de/prismplayer/2.9.9/aliplayer-min.js"></script>
 
   <script>
-    // 使用 HTTPS 地址避免混合内容问题
-    const RTS_PLAY_URL1 = "artc://a.zhezhishiyigedemo.me/live/live?auth_key=1762314680-0-0-1f1a9fa873d0b1a12ff1957bedf3c7ac";
-    const RTS_PLAY_URL2 = "artc://c.zhezhishiyigedemo.me/live/live?auth_key=1762318487-0-0-8e5b7da3581c66d46023d50c2927e6bf";
+    // RTS播放地址（artc://协议）
+    const RTS_PLAY_URL1 = "artc://a.zhezhishiyigedemo.me/live/live";
+    const RTS_PLAY_URL2 = "artc://c.zhezhishiyigedemo.me/live/live";
     
-    // 使用 HTTPS 转推地址
-    const STANDARD_FLV_URL1 = "https://c.zhezhishiyigedemo.me/live/live.flv";
-    const STANDARD_FLV_URL2 = "https://c.zhezhishiyigedemo.me/live/live2.flv";
-    const STANDARD_HLS_URL1 = "https://c.zhezhishiyigedemo.me/live/live.m3u8";
-    const STANDARD_HLS_URL2 = "https://c.zhezhishiyigedemo.me/live/live2.m3u8";
+    // 转推域名地址（用于标准协议兼容）
+    const STANDARD_FLV_URL1 = "http://c.zhezhishiyigedemo.me/live/live.flv";
+    const STANDARD_FLV_URL2 = "http://c.zhezhishiyigedemo.me/live/live2.flv";
+    const STANDARD_HLS_URL1 = "http://c.zhezhishiyigedemo.me/live/live.m3u8";
+    const STANDARD_HLS_URL2 = "http://c.zhezhishiyigedemo.me/live/live2.m3u8";
     
     let player1, player2;
     let currentMode = 'low-latency';
     let latencyTimer;
-    let playersReady = 0;
-
-    // 等待播放器脚本加载完成
-    function waitForPlayer(callback) {
-      if (window.Aliplayer) {
-        callback();
-      } else {
-        setTimeout(() => waitForPlayer(callback), 100);
-      }
-    }
 
     // 初始化
     document.addEventListener('DOMContentLoaded', function() {
@@ -328,17 +878,13 @@
         browserInfo = 'Google Chrome';
       } else if (userAgent.includes('Firefox')) {
         browserInfo = 'Mozilla Firefox';
-      } else if (userAgent.includes('Safari')) {
-        browserInfo = 'Safari';
       }
       document.getElementById('browser-info').textContent = browserInfo;
       
-      // 等待播放器加载完成
-      waitForPlayer(function() {
-        createPlayers();
-        startLatencySimulation();
-        checkGelloBackend();
-      });
+      createPlayers();
+      startLatencySimulation();
+      checkGelloBackend(); // 检测后端是否运行
+      updateModeButtons();
     });
 
     // 检测 GELLO 后端是否可用
@@ -346,22 +892,24 @@
       try {
         const res = await fetch('http://127.0.0.1:5001/health');
         if (res.ok) {
-          document.getElementById('gello-backend-status').textContent = '✅ 已就绪';
-          document.getElementById('gello-backend-status').style.color = '#4caf50';
+          document.getElementById('gello-backend-status').textContent = '已就绪';
+          const statusDot = document.querySelector('#gello-backend-status').previousElementSibling;
+          statusDot.className = 'status-dot status-ready';
         } else {
           throw new Error('Health check failed');
         }
       } catch (e) {
-        document.getElementById('gello-backend-status').textContent = '❌ 未运行（请先启动 gello_control.py）';
-        document.getElementById('gello-backend-status').style.color = '#f44336';
+        document.getElementById('gello-backend-status').textContent = '未运行（请先启动 gello_control.py）';
+        const statusDot = document.querySelector('#gello-backend-status').previousElementSibling;
+        statusDot.className = 'status-dot status-warning';
       }
     }
 
     // 启动 GELLO 遥操作
     async function startGelloTeleop() {
-      const btn = event.target;
+      const btn = document.getElementById('gello-btn');
       btn.disabled = true;
-      btn.textContent = "启动中...";
+      btn.innerHTML = '<span class="status-dot status-loading"></span> 启动中...';
 
       try {
         const response = await fetch('http://127.0.0.1:5001/start_gello', {
@@ -370,7 +918,9 @@
         const data = await response.json();
         
         if (response.ok) {
-          document.getElementById('status').textContent = '✅ GELLO 遥操作已启动！';
+          document.getElementById('status').textContent = 'GELLO 遥操作已启动！';
+          const statusDot = document.querySelector('#status').previousElementSibling;
+          statusDot.className = 'status-dot status-ready';
           alert('GELLO 遥操作已启动！\n请查看新打开的两个终端窗口。');
         } else {
           throw new Error(data.message || '未知错误');
@@ -378,34 +928,33 @@
       } catch (error) {
         console.error('启动遥操作失败:', error);
         showError('无法启动遥操作：' + error.message + '（请确认 gello_control.py 正在运行）');
-        document.getElementById('status').textContent = '❌ 启动遥操作失败';
+        document.getElementById('status').textContent = '启动遥操作失败';
+        const statusDot = document.querySelector('#status').previousElementSibling;
+        statusDot.className = 'status-dot status-error';
       } finally {
         btn.disabled = false;
-        btn.textContent = "启动 GELLO 遥操作";
+        btn.innerHTML = '<span>🤖</span> 启动 GELLO 遥操作';
       }
     }
     
     // 创建播放器
     function createPlayers() {
-      const commonConfig = {
+      const config1 = {
+        id: "J_prismPlayer1",
         isLive: true,
-        autoplay: false, // 改为手动播放避免自动播放策略限制
+        autoplay: true,
         useH5Prism: true,
         width: '100%',
-        height: '100%',
-        controlBarVisibility: 'hover',
-        extraInfo: '{"crossOrigin": "anonymous"}',
-        rtsSecure: true
-      };
-      
-      const config1 = {
-        ...commonConfig,
-        id: "J_prismPlayer1"
+        height: '100%'
       };
       
       const config2 = {
-        ...commonConfig,
-        id: "J_prismPlayer2"
+        id: "J_prismPlayer2",
+        isLive: true,
+        autoplay: true,
+        useH5Prism: true,
+        width: '100%',
+        height: '100%'
       };
       
       if (currentMode === 'low-latency') {
@@ -426,137 +975,117 @@
         document.getElementById('current-protocol').textContent = 'FLV (标准兼容)';
       }
       
-      try {
-        if (player1) player1.dispose();
-        if (player2) player2.dispose();
-        
-        playersReady = 0;
-        
-        player1 = new Aliplayer(config1, function(player) {
-          console.log("播放器1创建成功");
-          playersReady++;
-          checkAllPlayersReady();
-        });
-        
-        player2 = new Aliplayer(config2, function(player) {
-          console.log("播放器2创建成功");
-          playersReady++;
-          checkAllPlayersReady();
-        });
-        
-        bindPlayerEvents();
-      } catch (error) {
-        showError("播放器初始化失败: " + error.message);
-        console.error("播放器初始化错误:", error);
-      }
-    }
-    
-    function checkAllPlayersReady() {
-      if (playersReady === 2) {
-        document.getElementById('loading-message').style.display = 'none';
-        document.getElementById('status').textContent = '播放器已就绪，点击播放按钮开始';
+      if (player1) player1.dispose();
+      if (player2) player2.dispose();
+      
+      player1 = new Aliplayer(config1, function(player) {
+        console.log("播放器1创建成功");
+        document.getElementById('status').textContent = '播放器1已就绪';
         updateButtonStates();
-      }
+      });
+      
+      player2 = new Aliplayer(config2, function(player) {
+        console.log("播放器2创建成功");
+        document.getElementById('status').textContent = '播放器2已就绪';
+        updateButtonStates();
+      });
+      
+      bindPlayerEvents();
     }
     
     function bindPlayerEvents() {
-      // Player 1 事件
-      player1.on("ready", () => {
-        console.log("播放器1准备就绪");
-      });
-      
+      // Player 1
       player1.on("rtsTraceId", () => {
         document.getElementById('status').textContent = '播放器1正在播放 (超低延迟)';
-        hideError();
+        const statusDot = document.querySelector('#status').previousElementSibling;
+        statusDot.className = 'status-dot status-ready';
       });
       
       player1.on("rtsFallback", (e) => {
-        document.getElementById('status').textContent = '播放器1已降级: ' + (e.paramData?.reason || '未知原因');
-        showError("播放器1已降级到FLV模式，可能是RTS连接失败");
+        document.getElementById('status').textContent = '播放器1已降级: ' + e.paramData.reason;
+        const statusDot = document.querySelector('#status').previousElementSibling;
+        statusDot.className = 'status-dot status-warning';
       });
       
       player1.on("error", (e) => {
-        const errorMsg = e.paramData ? JSON.stringify(e.paramData) : (e.message || '未知错误');
         document.getElementById('status').textContent = '播放器1播放出错';
-        showError("播放器1错误: " + errorMsg);
+        const statusDot = document.querySelector('#status').previousElementSibling;
+        statusDot.className = 'status-dot status-error';
+        showError("播放器1错误: " + (e.message || JSON.stringify(e)));
       });
       
       player1.on("play", () => { 
         document.getElementById('status').textContent = '播放器1正在播放'; 
+        const statusDot = document.querySelector('#status').previousElementSibling;
+        statusDot.className = 'status-dot status-ready';
         updateButtonStates(); 
       });
       
       player1.on("pause", () => { 
         document.getElementById('status').textContent = '播放器1已暂停'; 
+        const statusDot = document.querySelector('#status').previousElementSibling;
+        statusDot.className = 'status-dot status-warning';
         updateButtonStates(); 
       });
       
-      // Player 2 事件
-      player2.on("ready", () => {
-        console.log("播放器2准备就绪");
-      });
-      
+      // Player 2
       player2.on("rtsTraceId", () => {
         document.getElementById('status').textContent = '播放器2正在播放 (超低延迟)';
-        hideError();
+        const statusDot = document.querySelector('#status').previousElementSibling;
+        statusDot.className = 'status-dot status-ready';
       });
       
       player2.on("rtsFallback", (e) => {
-        document.getElementById('status').textContent = '播放器2已降级: ' + (e.paramData?.reason || '未知原因');
-        showError("播放器2已降级到FLV模式，可能是RTS连接失败");
+        document.getElementById('status').textContent = '播放器2已降级: ' + e.paramData.reason;
+        const statusDot = document.querySelector('#status').previousElementSibling;
+        statusDot.className = 'status-dot status-warning';
       });
       
       player2.on("error", (e) => {
-        const errorMsg = e.paramData ? JSON.stringify(e.paramData) : (e.message || '未知错误');
         document.getElementById('status').textContent = '播放器2播放出错';
-        showError("播放器2错误: " + errorMsg);
+        const statusDot = document.querySelector('#status').previousElementSibling;
+        statusDot.className = 'status-dot status-error';
+        showError("播放器2错误: " + (e.message || JSON.stringify(e)));
       });
       
       player2.on("play", () => { 
         document.getElementById('status').textContent = '播放器2正在播放'; 
+        const statusDot = document.querySelector('#status').previousElementSibling;
+        statusDot.className = 'status-dot status-ready';
         updateButtonStates(); 
       });
       
       player2.on("pause", () => { 
         document.getElementById('status').textContent = '播放器2已暂停'; 
+        const statusDot = document.querySelector('#status').previousElementSibling;
+        statusDot.className = 'status-dot status-warning';
         updateButtonStates(); 
       });
     }
     
     function playBothVideos() { 
-      try {
-        player1.play(); 
-        player2.play(); 
-      } catch (error) {
-        showError("播放失败: " + error.message);
-      }
+      player1.play(); 
+      player2.play(); 
     }
     
     function pauseBothVideos() { 
-      try {
-        player1.pause(); 
-        player2.pause(); 
-      } catch (error) {
-        showError("暂停失败: " + error.message);
-      }
+      player1.pause(); 
+      player2.pause(); 
     }
     
     function toggleMuteBoth() {
-      try {
-        const newMute = !(player1.getMuted() || player2.getMuted());
-        player1.setMuted(newMute);
-        player2.setMuted(newMute);
-      } catch (error) {
-        showError("静音操作失败: " + error.message);
-      }
+      const newMute = !(player1.getMuted() || player2.getMuted());
+      player1.setMuted(newMute);
+      player2.setMuted(newMute);
     }
     
     function switchToLowLatency() {
       if (currentMode !== 'low-latency') {
         currentMode = 'low-latency';
-        document.getElementById('loading-message').style.display = 'block';
-        document.getElementById('status').textContent = '切换到超低延迟模式...';
         createPlayers();
+        document.getElementById('status').textContent = '切换到超低延迟模式';
+        const statusDot = document.querySelector('#status').previousElementSibling;
+        statusDot.className = 'status-dot status-ready';
         updateModeButtons();
       }
     }
@@ -564,9 +1093,10 @@
     function switchToStandard() {
       if (currentMode !== 'standard') {
         currentMode = 'standard';
-        document.getElementById('loading-message').style.display = 'block';
-        document.getElementById('status').textContent = '切换到标准兼容模式...';
         createPlayers();
+        document.getElementById('status').textContent = '切换到标准兼容模式';
+        const statusDot = document.querySelector('#status').previousElementSibling;
+        statusDot.className = 'status-dot status-warning';
         updateModeButtons();
       }
     }
@@ -574,20 +1104,21 @@
     function updateButtonStates() {
       const playBtn = document.getElementById('play-btn');
       const pauseBtn = document.getElementById('pause-btn');
-      try {
-        playBtn.disabled = (player1 && player1.isPlaying()) || (player2 && player2.isPlaying());
-        pauseBtn.disabled = !((player1 && player1.isPlaying()) || (player2 && player2.isPlaying()));
-      } catch (error) {
-        console.error("更新按钮状态失败:", error);
-      }
+      const isPlaying = (player1 && player1.isPlaying()) || (player2 && player2.isPlaying());
+      playBtn.disabled = isPlaying;
+      pauseBtn.disabled = !isPlaying;
     }
     
     function updateModeButtons() {
-      document.querySelectorAll('.controls button').forEach(btn => btn.classList.remove('active'));
+      const lowLatencyBtn = document.getElementById('low-latency-btn');
+      const standardBtn = document.getElementById('standard-btn');
+      
       if (currentMode === 'low-latency') {
-        document.querySelector('.controls button:nth-child(4)').classList.add('active');
+        lowLatencyBtn.classList.add('active');
+        standardBtn.classList.remove('active');
       } else {
-        document.querySelector('.controls button:nth-child(5)').classList.add('active');
+        standardBtn.classList.add('active');
+        lowLatencyBtn.classList.remove('active');
       }
     }
     
@@ -595,7 +1126,6 @@
       const el = document.getElementById('error-message');
       el.textContent = message;
       el.style.display = 'block';
-      console.error("播放器错误:", message);
     }
     
     function hideError() {
@@ -608,10 +1138,8 @@
         const el = document.getElementById('latency-value');
         if (currentMode === 'low-latency') {
           el.textContent = Math.floor(Math.random() * 200) + 200;
-          el.style.color = '#4caf50';
         } else {
           el.textContent = Math.floor(Math.random() * 7000) + 3000;
-          el.style.color = '#ff9800';
         }
       }, 1000);
     }
@@ -624,4 +1152,3 @@
   </script>
 </body>
 </html>
-
